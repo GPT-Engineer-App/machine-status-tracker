@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Center, Checkbox, Flex, Heading, Image, Stack, Text, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Button, Card, Center, Checkbox, Flex, Heading, IconButton, Image, Spacer, Stack, Text, VStack } from "@chakra-ui/react";
 import { FaClock, FaLock, FaUnlock } from "react-icons/fa";
 
 const machines = [
@@ -9,35 +9,24 @@ const machines = [
 ];
 
 const MachineCard = ({ machine, onClick }) => {
-  let statusIcon;
-  let statusColor;
+  const statusIcons = {
+    operational: { icon: FaUnlock, color: "green.500" },
+    second_factor_needed: { icon: FaClock, color: "yellow.500" },
+    non_operational: { icon: FaLock, color: "red.500" },
+  };
 
-  switch (machine.status) {
-    case "operational":
-      statusIcon = <FaUnlock />;
-      statusColor = "green.500";
-      break;
-    case "second_factor_needed":
-      statusIcon = <FaClock />;
-      statusColor = "yellow.500";
-      break;
-    case "non_operational":
-      statusIcon = <FaLock />;
-      statusColor = "red.500";
-      break;
-    default:
-      break;
-  }
+  const { icon: StatusIcon, color: statusColor } = statusIcons[machine.status] || {};
 
   return (
-    <Box borderWidth={1} borderRadius="lg" p={4} cursor="pointer" onClick={onClick}>
+    <Card p={4} cursor="pointer" onClick={onClick}>
       <Flex align="center">
         <Text fontWeight="bold" mr={2}>
           {machine.name}
         </Text>
-        <Box color={statusColor}>{statusIcon}</Box>
+        <Spacer />
+        <IconButton icon={<StatusIcon />} aria-label={`${machine.name} status`} color={statusColor} variant="ghost" />
       </Flex>
-    </Box>
+    </Card>
   );
 };
 
@@ -81,29 +70,29 @@ const MachinePage = ({ machine, onBack }) => {
       <VStack spacing={4} align="stretch">
         <Heading>{machine.name}</Heading>
         {machine.status === "non_operational" && (
-          <>
+          <Stack spacing={4}>
             <Text>Please complete the checklist to open the machine:</Text>
             <Checkbox onChange={handleChecklistChange}>Checklist completed</Checkbox>
             <Button onClick={handleOpenMachine} disabled={!checklistCompleted} colorScheme="blue">
               Open Machine
             </Button>
-          </>
+          </Stack>
         )}
         {machine.status === "second_factor_needed" && (
-          <>
+          <Stack spacing={4}>
             <Text>Second factor authentication required:</Text>
             <Checkbox onChange={handleSecondFactorChange}>Second factor completed</Checkbox>
             <Button onClick={handleOpenMachine} disabled={!secondFactorCompleted} colorScheme="blue">
               Open Machine
             </Button>
-          </>
+          </Stack>
         )}
         {machine.status === "operational" && timerStarted && (
           <>
             <Text>Machine is operational</Text>
             <Text>Time remaining: {formatTime(timeRemaining)}</Text>
             <Flex align="center">
-              <Image src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MDcxMzJ8MHwxfHNlYXJjaHwxfHxlbXBsb3llZSUyMHBvcnRyYWl0fGVufDB8fHx8MTcxMDQ1MjQ4MHww&ixlib=rb-4.0.3&q=80&w=1080" alt="Operator" borderRadius="full" boxSize="50px" mr={4} />
+              <Avatar src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MDcxMzJ8MHwxfHNlYXJjaHwxfHxlbXBsb3llZSUyMHBvcnRyYWl0fGVufDB8fHx8MTcxMDQ1MjQ4MHww&ixlib=rb-4.0.3&q=80&w=1080" name="John Doe" mr={4} />
               <Text>Opened by: John Doe</Text>
             </Flex>
           </>
